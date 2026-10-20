@@ -8,6 +8,9 @@ Para que otras aplicaciones hablen con Rubenchuelo, le den textos para leer o lo
   (o como `?token=` en la dirección, por ejemplo para `/api/eventos`).
 - Por defecto solo acepta conexiones desde **el mismo ordenador**. Para aceptar otros dispositivos
   de tu red, activa «Aceptar conexiones de otros dispositivos de la red» en Ajustes y reinicia.
+  Desde ellos se entra por la IP del ordenador (`http://192.168.1.20:7777`) o por su nombre
+  (`http://NOMBRE-DEL-PC:7777`); cualquier otro nombre se rechaza, para que una web no pueda
+  hacerse pasar por Rubenchuelo.
 - Las respuestas son JSON. Los errores llevan `{"error": "explicación"}` y un código HTTP
   (400 datos mal, 401 token, 404 no existe, 409 no se puede ahora, 413 demasiado grande).
 - Texto en **UTF-8** (si llega en la codificación antigua de Windows también lo entiende).

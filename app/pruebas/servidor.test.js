@@ -92,3 +92,20 @@ test('la API pide token, conversa, lee textos y guarda al salir', async (t) => {
   assert.ok(fs.existsSync(path.join(raiz, 'cerebros', 'principal', 'cerebro.json.gz')), 'ha guardado el cerebro');
   assert.ok(!fs.existsSync(path.join(raiz, 'en-uso.lock')), 'ha soltado el candado');
 });
+
+test('con acceso desde la red acepta IPs y el nombre del ordenador, pero no otros nombres', () => {
+  const { hostPermitido } = require('../api');
+  const permite = (host, accesoRed) => hostPermitido({ headers: { host } }, { puerto: 7777, ajustesApp: { accesoRed } });
+  const equipo = os.hostname().toLowerCase();
+  for (const host of ['127.0.0.1:7777', 'localhost:7777', '[::1]:7777']) {
+    assert.ok(permite(host, false), host);
+    assert.ok(permite(host, true), host);
+  }
+  for (const host of ['192.168.1.20:7777', '[fe80::1]:7777', `${equipo}:7777`, `${equipo}.local:7777`]) {
+    assert.ok(!permite(host, false), `${host} sin acceso desde la red`);
+    assert.ok(permite(host, true), `${host} con acceso desde la red`);
+  }
+  for (const host of ['malo.example:7777', 'rebind.example.com:7777', '192.168.1.20:80', '192.168.1.20', '', '[::1:7777']) {
+    assert.ok(!permite(host, true), `${host || '(vacío)'} nunca`);
+  }
+});

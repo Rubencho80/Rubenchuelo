@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
+const net = require('net');
+const os = require('os');
 const { ErrorHttp } = require('./aplicacion');
 const { codificarMapa, codificarPosiciones, mapaComoJSON } = require('./nucleo/formato-mapa');
 
@@ -167,10 +169,18 @@ function buscarRuta(metodo, camino) {
   return existe ? { metodoIncorrecto: true } : null;
 }
 
+// Con el acceso desde la red también vale una dirección IP o el nombre de este ordenador, pero
+// nunca otro nombre: podría ser una web que se hace pasar por Rubenchuelo («DNS rebinding»)
+// para leer la página con el token.
 function hostPermitido(req, app) {
-  if (app.ajustesApp.accesoRed) return true;
-  const host = String(req.headers.host || '').toLowerCase();
-  return [`127.0.0.1:${app.puerto}`, `localhost:${app.puerto}`, `[::1]:${app.puerto}`].includes(host);
+  const m = /^(\[[0-9a-f:.]+\]|[^:[\]]+):(\d+)$/.exec(String(req.headers.host || '').toLowerCase());
+  if (!m || Number(m[2]) !== app.puerto) return false;
+  const nombre = m[1];
+  if (['127.0.0.1', 'localhost', '[::1]'].includes(nombre)) return true;
+  if (!app.ajustesApp.accesoRed) return false;
+  if (net.isIPv4(nombre) || (nombre.startsWith('[') && net.isIPv6(nombre.slice(1, -1)))) return true;
+  const equipo = os.hostname().toLowerCase();
+  return nombre === equipo || nombre === `${equipo}.local`;
 }
 
 function servirEstatico(req, res, url, app) {
@@ -268,4 +278,4 @@ function crearManejador(app) {
   };
 }
 
-module.exports = { crearManejador };
+module.exports = { crearManejador, hostPermitido };
