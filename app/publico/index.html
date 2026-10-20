@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="rubenchuelo-token" content="{{TOKEN}}">
+  <title>Rubenchuelo</title>
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="icon" href="icono.png" type="image/png" sizes="256x256">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <g stroke-linecap="round" fill="none" stroke-width="2.2">
+          <path d="M16 16 L6 8" stroke="#4fd1c5"/>
+          <path d="M16 16 L5 20" stroke="#4fd1c5"/>
+          <path d="M16 16 L14 4" stroke="#c792ff"/>
+          <path d="M16 16 L27 27" stroke="#ffc24b"/>
+          <path d="M23 23 L29 19" stroke="#ffc24b"/>
+        </g>
+        <circle cx="16" cy="16" r="5.2" fill="#0f8f86"/>
+        <circle cx="16" cy="16" r="2.2" fill="#e8fbff"/>
+      </svg>
+      <span class="nombre">Rubenchuelo</span>
+      <span class="cerebro-activo" id="cerebroActivo" title="Cerebro que está usando"></span>
+    </div>
+
+    <div class="vitales">
+      <div class="estado" id="estado" data-estado="despierto"><span class="punto"></span><span id="estadoTexto">Despertando…</span></div>
+      <div class="medidor" id="medPresion" title="Presión de sueño (adenosina): sube con lo que aprende y con el tiempo despierto. Al 100 % está agotado.">
+        <span>Sueño</span><span class="barra-medidor"><span class="relleno"></span></span><span class="valor">0 %</span>
+      </div>
+      <div class="medidor" id="medDopamina" title="Dopamina: sube con 👍 y baja con 👎. Con dopamina alta aprende con más fuerza.">
+        <span>Dopamina</span><span class="barra-medidor"><span class="relleno"></span></span><span class="valor">0</span>
+      </div>
+      <div class="medidor" id="medSorpresa" title="Sorpresa del último mensaje: cuánto de nuevo tenía. Lo sorprendente se aprende más fuerte.">
+        <span>Sorpresa</span><span class="barra-medidor"><span class="relleno"></span></span><span class="valor">0 %</span>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button class="boton boton-noche" id="btnDormir" type="button">Dormir</button>
+      <button class="boton boton-sobrio" id="btnSalir" type="button" title="Guarda el cerebro y cierra Rubenchuelo (para quitar el pendrive)">Guardar y salir</button>
+    </div>
+  </header>
+
+  <div class="aviso-conexion" id="avisoConexion" role="alert" hidden>
+    Sin conexión con Rubenchuelo. Si lo has cerrado, vuelve a abrirlo (<b>Rubenchuelo.exe</b> o <b>Iniciar.bat</b>); esta página se reconectará sola.
+  </div>
+
+  <main class="cuerpo">
+    <section class="panel" aria-label="Panel de control">
+      <nav class="pestanas" role="tablist" aria-label="Secciones">
+        <button role="tab" id="tab-charla" aria-controls="vista-charla" aria-selected="true" data-pestana="charla">Charla</button>
+        <button role="tab" id="tab-suenos" aria-controls="vista-suenos" aria-selected="false" data-pestana="suenos">Sueños<span class="contador" id="contadorSuenos"></span></button>
+        <button role="tab" id="tab-ajustes" aria-controls="vista-ajustes" aria-selected="false" data-pestana="ajustes">Ajustes</button>
+        <button role="tab" id="tab-cerebros" aria-controls="vista-cerebros" aria-selected="false" data-pestana="cerebros">Cerebros</button>
+        <button role="tab" id="tab-conexiones" aria-controls="vista-conexiones" aria-selected="false" data-pestana="conexiones">Conexiones</button>
+      </nav>
+
+      <div class="vista" id="vista-charla" role="tabpanel" aria-labelledby="tab-charla">
+        <div class="charla" id="charla" aria-live="polite"></div>
+        <div class="lectura-barra" id="lecturaBarra" hidden></div>
+        <div class="oido-barra" id="oidoBarra" role="status" aria-live="polite" hidden>
+          <div class="oido-fila">
+            <span class="oido-punto" aria-hidden="true"></span>
+            <b id="oidoEstado">Escuchando</b>
+            <span class="oido-nivel" aria-hidden="true"><span id="oidoNivel"></span></span>
+            <span class="oido-cuentas" id="oidoCuentas"></span>
+          </div>
+          <div class="oido-parcial" id="oidoParcial"></div>
+          <div class="oido-ultima" id="oidoUltima"></div>
+        </div>
+        <form class="escribir" id="formEscribir">
+          <button type="button" class="boton-icono" id="btnAdjuntar" title="Darle un archivo de texto para leer (.txt)" aria-label="Darle un archivo de texto para leer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>
+            </svg>
+          </button>
+          <button type="button" class="boton-icono" id="btnEscuchar" aria-pressed="false" title="Escuchar: aprende de lo que oiga por el micrófono, sin contestar" aria-label="Escuchar por el micrófono">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3M9 21h6"/>
+            </svg>
+          </button>
+          <textarea id="entrada" rows="1" placeholder="Dile algo a Rubenchuelo…" aria-label="Mensaje para Rubenchuelo"></textarea>
+          <button type="submit" class="boton boton-accion" id="btnEnviar">Enviar</button>
+          <input type="file" id="archivo" accept=".txt,.md,.csv,.srt,text/plain" hidden>
+        </form>
+      </div>
+      <div class="vista" id="vista-suenos" role="tabpanel" aria-labelledby="tab-suenos" hidden></div>
+      <div class="vista" id="vista-ajustes" role="tabpanel" aria-labelledby="tab-ajustes" hidden></div>
+      <div class="vista" id="vista-cerebros" role="tabpanel" aria-labelledby="tab-cerebros" hidden></div>
+      <div class="vista" id="vista-conexiones" role="tabpanel" aria-labelledby="tab-conexiones" hidden></div>
+    </section>
+
+    <section class="mapa" aria-label="Mapa de neuronas">
+      <canvas id="lienzo" tabindex="0" aria-label="Mapa de neuronas. Rueda del ratón para acercar, arrastrar para moverte, clic en una neurona para ver sus conexiones."></canvas>
+      <div class="filtros" id="filtros" role="group" aria-label="Tipos de neurona visibles"></div>
+      <div class="mapa-herramientas">
+        <div class="buscador">
+          <input class="vidrio" id="buscar" type="search" placeholder="Buscar palabra…" autocomplete="off" aria-label="Buscar una palabra en el mapa">
+          <ul class="sugerencias vidrio" id="sugerencias" hidden></ul>
+        </div>
+        <div class="mapa-botones">
+          <button class="boton-mapa vidrio" id="btnOptimizado" type="button" aria-pressed="true" title="Dibuja el mapa con la tarjeta gráfica para que vaya fluido aunque tenga muchísimas neuronas. Apágalo para volver al dibujo clásico.">Optimizado</button>
+          <button class="boton-mapa vidrio" id="btnEtiquetas" type="button" aria-pressed="true">Etiquetas</button>
+          <button class="boton-mapa vidrio" id="btnEncajar" type="button">Ver todo</button>
+        </div>
+      </div>
+      <div class="mapa-pie" id="mapaPie"></div>
+      <label class="control-peso vidrio" title="Oculta las conexiones más débiles que este peso">
+        Conexiones desde <input type="range" id="rangoPeso" min="0" max="0.8" step="0.02" value="0"> <span id="valorPeso">0</span>
+      </label>
+      <div class="rotulo vidrio" id="rotulo" hidden></div>
+      <aside class="inspector vidrio" id="inspector" aria-label="Detalle de la neurona" hidden></aside>
+    </section>
+  </main>
+
+  <div class="soltar" id="soltar" hidden><p>Suelta el archivo para que Rubenchuelo lo lea</p></div>
+  <div class="avisos" id="avisos" aria-live="polite"></div>
+  <dialog id="dialogo"></dialog>
+
+  <script type="module" src="js/principal.js"></script>
+</body>
+</html>

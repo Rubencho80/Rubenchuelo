@@ -1,0 +1,17 @@
+# Lo tuyo: lo que sabe cada cerebro y los ajustes (con el token)
+/cerebros/
+/ajustes.json
+
+# Lo que se crea con herramientas/construir.js (el instalador va en Releases)
+*.exe
+!/herramientas/**
+
+# Programas de otros, demasiado grandes para el repositorio (ver LEEME.md)
+/runtime/node.exe
+/oido/motor/
+/oido/modelo/
+/oido/whisper/
+
+en-uso.lock
+*.tmp
+.claude/

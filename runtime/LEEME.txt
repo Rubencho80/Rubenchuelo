@@ -1,0 +1,8 @@
+node.exe es Node.js v24.15.0 para Windows (64 bits), copiado de la instalación
+de este ordenador para que Rubenchuelo funcione en cualquier Windows sin instalar nada.
+
+Node.js es software libre con licencia MIT: https://nodejs.org
+Licencia completa: https://github.com/nodejs/node/blob/main/LICENSE
+
+Si algún día quieres actualizarlo, sustituye node.exe por uno más moderno
+(descargado de https://nodejs.org, versión "Windows Binary (.zip)").
